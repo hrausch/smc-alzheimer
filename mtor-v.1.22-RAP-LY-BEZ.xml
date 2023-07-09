@@ -1,0 +1,1240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+//clock time;
+typedef int[-2147483648,2147483647] int32_t;
+
+
+clock t;
+
+int timeToAddDrug = 100;
+int intervalToAddDrug = 24;
+
+bool drugAdded=false;
+
+
+
+broadcast chan mTORactivated;
+broadcast chan amTORabove;
+
+clock timeMTORactivated=0.0;
+double timeStartAmTORC1aboveMTORC1=0.0;
+double timeEndAmTORC1aboveMTORC1=0.0;
+double timeAmTORC1aboveMTORC1=0.0;
+
+const double AV = 6.022e23;
+const double precision = 1e-9; //nM
+const double unit = AV*precision;
+
+const int timeUnitMinuteToHour =1;// 60;
+const int timeUnitSecondToHour = 3600;
+
+// nM
+int32_t IRS = 100; 
+int32_t PI3K = 100; 
+int32_t aPI3K=0;
+int32_t AKT = 100;  
+int32_t aAKT;
+int32_t mTORC1 = 100; 
+int32_t amTORC1 = 0;
+int32_t mTORC2 = 100;  
+int32_t amTORC2;
+int32_t S6K = 50;  
+int32_t aS6K=0;
+int32_t GSK3 = 0;  
+int32_t aGSK3 = 100;
+int32_t TAU = 100;  
+int32_t aTAU = 0;
+int32_t aggTAU = 0;
+int32_t NFT = 0;
+
+
+
+int32_t ABETA = 100;
+int32_t ABETADIMER = 0;
+int32_t ABETAPLAQUE = 100;    
+
+int32_t SOURCE = 0;
+
+int32_t DOSE_LY = 50;
+int32_t LY = 0;
+int32_t PI3K_LY = 0;
+int32_t aPI3K_LY = 0;
+
+//this variable is used by RAP and BEZ
+int32_t DOSE = 50;
+
+
+int32_t RAP = 0;
+int32_t mTORC1_RAP = 0;
+int32_t amTORC1_RAP = 0;
+
+
+int32_t BEZ = 0;
+int32_t mTORC1_BEZ = 0;
+int32_t amTORC1_BEZ = 0;
+int32_t PI3K_BEZ = 0;
+int32_t aPI3K_BEZ = 0;
+
+const double k2a = 0.1; 
+const double k2b = 1.0;  
+const double k3a = 0.005; 
+const double k3b = 2.0; 
+const double k4a = 0.1; 
+const double k4b = 1.0; 
+const double k5a = 0.001; 
+const double k5b = 0.01; 
+const double kprodAbeta = 1.86e-3;
+const double k7a = 0.01;
+const double k7b = 0.003;
+const double k8a = 0.3; 
+const double k8b = 3.0; 
+const double k9a = 0.002;
+const double k9b = 0.01;
+const double k3aa = 1.5;
+const double k6f = 0.1;  
+const double kabetadeg = 1.5e-5;
+const double kprodAbetaDimer = 3.0e-6;
+const double krelAbetaDimer = 1.0e-6;
+const double kprodAbetaPlaque = 0.2;
+const double krelAbetaPlaque = 0.0002;
+const double kaggTauP1 = 1e-08*3600;
+const double ktangfor = 0.001*3600;
+const double ksynTau = 8e-05*3600;
+
+//RAP
+const double kRapTORC1binding = 1.92e-6*timeUnitSecondToHour; 
+const double kRapTORC1release = 2.2e-6*timeUnitSecondToHour; 
+const double kRapDeg = 0.0718632; 
+
+
+
+//LY
+const double kLYbin =  1.6*60; 
+const double kLYrel =  0.96*60; 
+const double kLYdeg = 0.04553*60; 
+
+//BEZ
+const double kBezTORC1binding = 2.5;
+const double kBezTORC1release = 1.4;
+const double kBezPI3Kbinding = 2.5;
+const double kBezPI3Krelease = 4.2;
+const double kBezDeg = 0.07875; //  hour 
+
+
+
+
+</declaration>
+	<template>
+		<name>DrugAdmBez</name>
+		<location id="id0" x="-1130" y="-101">
+			<label kind="invariant" x="-1173" y="-135">t&lt;=100</label>
+		</location>
+		<location id="id1" x="-824" y="-101">
+			<label kind="invariant" x="-824" y="-135">t&lt;=124</label>
+		</location>
+		<location id="id2" x="-823" y="-25">
+			<label kind="invariant" x="-867" y="-8">t&lt;=148</label>
+		</location>
+		<location id="id3" x="-1130" y="-25">
+			<label kind="invariant" x="-1173" y="-59">t&lt;=172</label>
+		</location>
+		<location id="id4" x="-1130" y="68">
+			<label kind="invariant" x="-1173" y="85">t&lt;=196</label>
+		</location>
+		<location id="id5" x="-824" y="68">
+			<label kind="invariant" x="-824" y="34">t&lt;=220</label>
+		</location>
+		<location id="id6" x="-824" y="162">
+			<label kind="invariant" x="-867" y="178">t&lt;=244</label>
+		</location>
+		<location id="id7" x="-1130" y="162">
+		</location>
+		<init ref="id0"/>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-969" y="128">t==244</label>
+			<label kind="assignment" x="-969" y="145">BEZ=BEZ+DOSE</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-807" y="94">t==220</label>
+			<label kind="assignment" x="-807" y="111">BEZ=BEZ+DOSE</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-1062" y="68">t==196</label>
+			<label kind="assignment" x="-1062" y="85">BEZ=BEZ+DOSE</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-1190" y="1">t==172</label>
+			<label kind="assignment" x="-1241" y="17">BEZ=BEZ+DOSE</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-969" y="-59">t==148</label>
+			<label kind="assignment" x="-969" y="-42">BEZ=BEZ+DOSE</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-807" y="-84">t==124</label>
+			<label kind="assignment" x="-807" y="-67">BEZ=BEZ+DOSE</label>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-1071" y="-135">t==100</label>
+			<label kind="assignment" x="-1071" y="-118">BEZ=DOSE, drugAdded=true</label>
+		</transition>
+	</template>
+	<template>
+		<name>DrugAdmBez2</name>
+		<location id="id8" x="0" y="0">
+			<label kind="invariant" x="-10" y="17">t&lt;=100</label>
+		</location>
+		<location id="id9" x="314" y="0">
+		</location>
+		<init ref="id8"/>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id9"/>
+			<label kind="guard" x="18" y="-34">t==100</label>
+			<label kind="assignment" x="18" y="0">BEZ=DOSE, drugAdded=true</label>
+		</transition>
+	</template>
+	<template>
+		<name>aPI3KbinBEZ</name>
+		<location id="id10" x="-722" y="-255">
+			<label kind="exponentialrate" x="-792" y="-229">kBezPI3Kbinding*aPI3K*BEZ</label>
+		</location>
+		<init ref="id10"/>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-807" y="-391">aPI3K &gt; 0 &amp;&amp; BEZ &gt; 0</label>
+			<label kind="assignment" x="-807" y="-365">aPI3K--, BEZ--,aPI3K_BEZ++</label>
+			<nail x="-807" y="-340"/>
+			<nail x="-595" y="-340"/>
+		</transition>
+	</template>
+	<template>
+		<name>PI3KbinBEZ</name>
+		<location id="id11" x="-578" y="-178">
+			<label kind="exponentialrate" x="-588" y="-144">kBezPI3Kbinding*PI3K*BEZ</label>
+		</location>
+		<init ref="id11"/>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-671" y="-323">PI3K &gt; 0 &amp;&amp; BEZ &gt; 0</label>
+			<label kind="assignment" x="-671" y="-306">PI3K--, BEZ--,PI3K_BEZ++</label>
+			<nail x="-671" y="-280"/>
+			<nail x="-442" y="-280"/>
+		</transition>
+	</template>
+	<template>
+		<name>PI3KrelBEZ</name>
+		<location id="id12" x="0" y="0">
+			<label kind="exponentialrate" x="-10" y="34">kBezPI3Krelease*PI3K_BEZ</label>
+		</location>
+		<init ref="id12"/>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id12"/>
+			<label kind="guard" x="-127" y="-153">PI3K_BEZ&gt;0</label>
+			<label kind="assignment" x="-127" y="-170">PI3K_BEZ--, PI3K++, BEZ++</label>
+			<nail x="-127" y="-119"/>
+			<nail x="119" y="-119"/>
+		</transition>
+	</template>
+	<template>
+		<name>aPI3KrelBEZ</name>
+		<location id="id13" x="0" y="0">
+			<label kind="exponentialrate" x="-10" y="34">kBezPI3Krelease*aPI3K_BEZ</label>
+		</location>
+		<init ref="id13"/>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id13"/>
+			<label kind="guard" x="-144" y="-153">aPI3K_BEZ&gt;0</label>
+			<label kind="assignment" x="-144" y="-127">aPI3K_BEZ--, aPI3K++, BEZ++</label>
+			<nail x="-144" y="-102"/>
+			<nail x="102" y="-102"/>
+		</transition>
+	</template>
+	<template>
+		<name>amTORC1binBEZ</name>
+		<location id="id14" x="-722" y="-255">
+			<label kind="exponentialrate" x="-792" y="-229">kBezTORC1binding*amTORC1*BEZ</label>
+		</location>
+		<init ref="id14"/>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id14"/>
+			<label kind="guard" x="-807" y="-391">amTORC1 &gt; 0 &amp;&amp; BEZ &gt; 0</label>
+			<label kind="assignment" x="-807" y="-365">amTORC1--, BEZ--,amTORC1_BEZ++</label>
+			<nail x="-807" y="-340"/>
+			<nail x="-595" y="-340"/>
+		</transition>
+	</template>
+	<template>
+		<name>amTORC1relBEZ</name>
+		<location id="id15" x="0" y="0">
+			<label kind="exponentialrate" x="-10" y="34">kBezTORC1release*amTORC1_BEZ</label>
+		</location>
+		<init ref="id15"/>
+		<transition>
+			<source ref="id15"/>
+			<target ref="id15"/>
+			<label kind="guard" x="-144" y="-153">amTORC1_BEZ&gt;0</label>
+			<label kind="assignment" x="-144" y="-127">amTORC1_BEZ--, amTORC1++, BEZ++</label>
+			<nail x="-144" y="-102"/>
+			<nail x="102" y="-102"/>
+		</transition>
+	</template>
+	<template>
+		<name>mTORC1binBEZ</name>
+		<location id="id16" x="-578" y="-178">
+			<label kind="exponentialrate" x="-588" y="-144">kBezTORC1binding*mTORC1*BEZ</label>
+		</location>
+		<init ref="id16"/>
+		<transition>
+			<source ref="id16"/>
+			<target ref="id16"/>
+			<label kind="guard" x="-671" y="-323">mTORC1 &gt; 0 &amp;&amp; BEZ &gt; 0</label>
+			<label kind="assignment" x="-671" y="-306">mTORC1--, BEZ--,mTORC1_BEZ++</label>
+			<nail x="-671" y="-280"/>
+			<nail x="-442" y="-280"/>
+		</transition>
+	</template>
+	<template>
+		<name>mTORC1relBEZ</name>
+		<location id="id17" x="0" y="0">
+			<label kind="exponentialrate" x="-10" y="34">kBezTORC1release*mTORC1_BEZ</label>
+		</location>
+		<init ref="id17"/>
+		<transition>
+			<source ref="id17"/>
+			<target ref="id17"/>
+			<label kind="guard" x="-127" y="-153">mTORC1_BEZ&gt;0</label>
+			<label kind="assignment" x="-127" y="-170">mTORC1_BEZ--, mTORC1++, BEZ++</label>
+			<nail x="-127" y="-119"/>
+			<nail x="119" y="-119"/>
+		</transition>
+	</template>
+	<template>
+		<name>BEZDeg</name>
+		<location id="id18" x="-263" y="-68">
+			<label kind="exponentialrate" x="-273" y="-34">kBezDeg*BEZ</label>
+		</location>
+		<init ref="id18"/>
+		<transition>
+			<source ref="id18"/>
+			<target ref="id18"/>
+			<label kind="guard" x="-391" y="-255">BEZ&gt;0</label>
+			<label kind="assignment" x="-391" y="-238">BEZ--</label>
+			<nail x="-408" y="-187"/>
+			<nail x="-136" y="-187"/>
+		</transition>
+	</template>
+	<template>
+		<name>DrugAdmRap2</name>
+		<location id="id19" x="-34" y="25">
+			<label kind="invariant" x="-44" y="42">t&lt;=100</label>
+		</location>
+		<location id="id20" x="245" y="22">
+			<name x="235" y="-12">added</name>
+			<label kind="invariant" x="262" y="22">t&lt;=124</label>
+		</location>
+		<location id="id21" x="245" y="107">
+			<label kind="invariant" x="235" y="124">t&lt;=148</label>
+		</location>
+		<location id="id22" x="24" y="107">
+			<label kind="invariant" x="14" y="124">t&lt;=172</label>
+		</location>
+		<location id="id23" x="24" y="191">
+			<label kind="invariant" x="14" y="208">t&lt;=196</label>
+		</location>
+		<location id="id24" x="254" y="200">
+			<label kind="invariant" x="244" y="217">t&lt;=220</label>
+		</location>
+		<location id="id25" x="262" y="285">
+			<label kind="invariant" x="252" y="302">t&lt;=244</label>
+		</location>
+		<location id="id26" x="33" y="285">
+		</location>
+		<init ref="id19"/>
+		<transition>
+			<source ref="id25"/>
+			<target ref="id26"/>
+			<label kind="guard" x="152" y="259">t==244</label>
+			<label kind="assignment" x="118" y="293">RAP=RAP+DOSE,  LY=LY+DOSE_LY</label>
+		</transition>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id25"/>
+			<label kind="guard" x="258" y="208">t==220</label>
+			<label kind="assignment" x="258" y="242">RAP=RAP+DOSE,  LY=LY+DOSE_LY</label>
+		</transition>
+		<transition>
+			<source ref="id23"/>
+			<target ref="id24"/>
+			<label kind="guard" x="42" y="161">t==196</label>
+			<label kind="assignment" x="42" y="195">RAP=RAP+DOSE,  LY=LY+DOSE_LY</label>
+		</transition>
+		<transition>
+			<source ref="id22"/>
+			<target ref="id23"/>
+			<label kind="guard" x="24" y="119">t==172</label>
+			<label kind="assignment" x="24" y="153">RAP=RAP+DOSE,  LY=LY+DOSE_LY</label>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id22"/>
+			<label kind="guard" x="42" y="77">t==148</label>
+			<label kind="assignment" x="42" y="111">RAP=RAP+DOSE,  LY=LY+DOSE_LY</label>
+		</transition>
+		<transition>
+			<source ref="id20"/>
+			<target ref="id21"/>
+			<label kind="guard" x="245" y="47">t==124</label>
+			<label kind="assignment" x="245" y="65">RAP=RAP+DOSE,  LY=LY+DOSE_LY</label>
+		</transition>
+		<transition>
+			<source ref="id19"/>
+			<target ref="id20"/>
+			<label kind="guard" x="24" y="-12">t==100</label>
+			<label kind="assignment" x="17" y="0">RAP=DOSE, LY=LY+DOSE_LY,  drugAdded=true</label>
+		</transition>
+	</template>
+	<template>
+		<name>DrugAdmRap</name>
+		<location id="id27" x="-2660" y="-2669">
+			<label kind="invariant" x="-2669" y="-2626">t&lt;=100</label>
+		</location>
+		<location id="id28" x="-2303" y="-2669">
+			<name x="-2313" y="-2703">added</name>
+		</location>
+		<init ref="id27"/>
+		<transition>
+			<source ref="id27"/>
+			<target ref="id28"/>
+			<label kind="guard" x="-2642" y="-2703">t==100</label>
+			<label kind="assignment" x="-2642" y="-2669">RAP=DOSE, LY=DOSE_LY, drugAdded=true</label>
+		</transition>
+	</template>
+	<template>
+		<name>amTORC1binRAP</name>
+		<location id="id29" x="-722" y="-255">
+			<label kind="exponentialrate" x="-792" y="-229">kRapTORC1binding*amTORC1*RAP</label>
+		</location>
+		<init ref="id29"/>
+		<transition>
+			<source ref="id29"/>
+			<target ref="id29"/>
+			<label kind="guard" x="-807" y="-391">amTORC1 &gt; 0 &amp;&amp; RAP &gt; 0</label>
+			<label kind="assignment" x="-807" y="-365">amTORC1--, RAP--,amTORC1_RAP++</label>
+			<nail x="-807" y="-340"/>
+			<nail x="-595" y="-340"/>
+		</transition>
+	</template>
+	<template>
+		<name>amTORC1relRAP</name>
+		<location id="id30" x="0" y="0">
+			<label kind="exponentialrate" x="-10" y="34">kRapTORC1release*amTORC1_RAP</label>
+		</location>
+		<init ref="id30"/>
+		<transition>
+			<source ref="id30"/>
+			<target ref="id30"/>
+			<label kind="guard" x="-144" y="-153">amTORC1_RAP&gt;0</label>
+			<label kind="assignment" x="-144" y="-127">amTORC1_RAP--, amTORC1++, RAP++</label>
+			<nail x="-144" y="-102"/>
+			<nail x="102" y="-102"/>
+		</transition>
+	</template>
+	<template>
+		<name>mTORC1binRAP</name>
+		<location id="id31" x="-578" y="-178">
+			<label kind="exponentialrate" x="-588" y="-144">kRapTORC1binding*mTORC1*RAP</label>
+		</location>
+		<init ref="id31"/>
+		<transition>
+			<source ref="id31"/>
+			<target ref="id31"/>
+			<label kind="guard" x="-671" y="-323">mTORC1 &gt; 0 &amp;&amp; RAP &gt; 0</label>
+			<label kind="assignment" x="-671" y="-306">mTORC1--, RAP--,mTORC1_RAP++</label>
+			<nail x="-671" y="-280"/>
+			<nail x="-442" y="-280"/>
+		</transition>
+	</template>
+	<template>
+		<name>mTORC1relRAP</name>
+		<location id="id32" x="0" y="0">
+			<label kind="exponentialrate" x="-10" y="34">kRapTORC1release*mTORC1_RAP</label>
+		</location>
+		<init ref="id32"/>
+		<transition>
+			<source ref="id32"/>
+			<target ref="id32"/>
+			<label kind="guard" x="-127" y="-153">mTORC1_RAP&gt;0</label>
+			<label kind="assignment" x="-127" y="-170">mTORC1_RAP--, mTORC1++, RAP++</label>
+			<nail x="-127" y="-119"/>
+			<nail x="119" y="-119"/>
+		</transition>
+	</template>
+	<template>
+		<name>RAPDeg</name>
+		<location id="id33" x="-306" y="-119">
+			<label kind="exponentialrate" x="-314" y="-85">kRapDeg*RAP</label>
+		</location>
+		<init ref="id33"/>
+		<transition>
+			<source ref="id33"/>
+			<target ref="id33"/>
+			<label kind="guard" x="-382" y="-246">RAP&gt;0</label>
+			<label kind="assignment" x="-382" y="-229">RAP--</label>
+			<nail x="-382" y="-204"/>
+			<nail x="-204" y="-204"/>
+		</transition>
+	</template>
+	<template>
+		<name>DrugAdmLY</name>
+		<location id="id34" x="0" y="0">
+			<label kind="invariant" x="-10" y="17">t&lt;=100</label>
+		</location>
+		<location id="id35" x="297" y="0">
+		</location>
+		<init ref="id34"/>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id35"/>
+			<label kind="guard" x="18" y="-34">t==100</label>
+			<label kind="assignment" x="18" y="0">LY=DOSE_LY, drugAdded=true</label>
+		</transition>
+	</template>
+	<template>
+		<name>DrugAdmLY2</name>
+		<location id="id36" x="-994" y="-433">
+			<label kind="invariant" x="-1004" y="-416">t&lt;=100</label>
+		</location>
+		<location id="id37" x="-731" y="-433">
+			<label kind="invariant" x="-765" y="-467">t&lt;=124</label>
+		</location>
+		<location id="id38" x="-731" y="-323">
+			<label kind="invariant" x="-741" y="-306">t&lt;=148</label>
+		</location>
+		<location id="id39" x="-994" y="-323">
+			<label kind="invariant" x="-1045" y="-357">t&lt;=172</label>
+		</location>
+		<location id="id40" x="-994" y="-229">
+			<label kind="invariant" x="-1004" y="-212">t&lt;=196</label>
+		</location>
+		<location id="id41" x="-782" y="-229">
+			<label kind="invariant" x="-765" y="-238">t&lt;=220</label>
+		</location>
+		<location id="id42" x="-782" y="-136">
+			<label kind="invariant" x="-792" y="-119">t&lt;=244</label>
+		</location>
+		<location id="id43" x="-1003" y="-136">
+		</location>
+		<init ref="id36"/>
+		<transition>
+			<source ref="id42"/>
+			<target ref="id43"/>
+			<label kind="guard" x="-969" y="-170">t==244</label>
+			<label kind="assignment" x="-969" y="-153">LY=LY + DOSE_LY</label>
+		</transition>
+		<transition>
+			<source ref="id41"/>
+			<target ref="id42"/>
+			<label kind="guard" x="-765" y="-195">t==220</label>
+			<label kind="assignment" x="-765" y="-178">LY=LY + DOSE_LY</label>
+		</transition>
+		<transition>
+			<source ref="id40"/>
+			<target ref="id41"/>
+			<label kind="guard" x="-969" y="-263">t==196</label>
+			<label kind="assignment" x="-969" y="-246">LY=LY + DOSE_LY</label>
+		</transition>
+		<transition>
+			<source ref="id39"/>
+			<target ref="id40"/>
+			<label kind="guard" x="-1122" y="-289">t==172</label>
+			<label kind="assignment" x="-1122" y="-272">LY=LY + DOSE_LY</label>
+		</transition>
+		<transition>
+			<source ref="id38"/>
+			<target ref="id39"/>
+			<label kind="guard" x="-960" y="-357">t&lt;=148</label>
+			<label kind="assignment" x="-960" y="-340">LY=LY + DOSE_LY</label>
+		</transition>
+		<transition>
+			<source ref="id37"/>
+			<target ref="id38"/>
+			<label kind="guard" x="-722" y="-391">t==124</label>
+			<label kind="assignment" x="-722" y="-374">LY=LY + DOSE_LY</label>
+		</transition>
+		<transition>
+			<source ref="id36"/>
+			<target ref="id37"/>
+			<label kind="guard" x="-976" y="-467">t==100</label>
+			<label kind="assignment" x="-977" y="-450">LY=DOSE_LY, drugAdded=true</label>
+		</transition>
+	</template>
+	<template>
+		<name>PI3KbinLY</name>
+		<location id="id44" x="0" y="0">
+			<label kind="exponentialrate" x="-42" y="17">kLYbin*PI3K*LY</label>
+		</location>
+		<init ref="id44"/>
+		<transition>
+			<source ref="id44"/>
+			<target ref="id44"/>
+			<label kind="guard" x="-86" y="-141">PI3K &gt; 0 &amp;&amp; LY&gt;0</label>
+			<label kind="assignment" x="-85" y="-119">PI3K--, LY--, PI3K_LY++</label>
+			<nail x="-86" y="-98"/>
+			<nail x="109" y="-98"/>
+		</transition>
+	</template>
+	<template>
+		<name>PI3KrelLY</name>
+		<location id="id45" x="0" y="0">
+			<label kind="exponentialrate" x="-42" y="17">kLYrel*PI3K_LY</label>
+		</location>
+		<init ref="id45"/>
+		<transition>
+			<source ref="id45"/>
+			<target ref="id45"/>
+			<label kind="guard" x="-86" y="-110">PI3K_LY&gt;0</label>
+			<label kind="assignment" x="-85" y="-93">PI3K_LY--, PI3K++, LY++</label>
+			<nail x="-86" y="-68"/>
+			<nail x="101" y="-68"/>
+		</transition>
+	</template>
+	<template>
+		<name>aPI3KbinLY</name>
+		<location id="id46" x="0" y="0">
+			<label kind="exponentialrate" x="-51" y="17">kLYbin*aPI3K*LY</label>
+		</location>
+		<init ref="id46"/>
+		<transition>
+			<source ref="id46"/>
+			<target ref="id46"/>
+			<label kind="guard" x="-76" y="-119">aPI3K&gt;0 &amp;&amp; LY&gt;0</label>
+			<label kind="assignment" x="-76" y="-102">aPI3K--, LY--, aPI3K_LY++</label>
+			<nail x="-76" y="-76"/>
+			<nail x="68" y="-76"/>
+		</transition>
+	</template>
+	<template>
+		<name>aPI3KrelLY</name>
+		<location id="id47" x="0" y="0">
+			<label kind="exponentialrate" x="-51" y="17">kLYrel*aPI3K_LY</label>
+		</location>
+		<init ref="id47"/>
+		<transition>
+			<source ref="id47"/>
+			<target ref="id47"/>
+			<label kind="guard" x="-76" y="-110">aPI3K_LY&gt;0</label>
+			<label kind="assignment" x="-76" y="-93">aPI3K_LY--, aPI3K++, LY++</label>
+			<nail x="-76" y="-68"/>
+			<nail x="85" y="-68"/>
+		</transition>
+	</template>
+	<template>
+		<name>LYDeg</name>
+		<location id="id48" x="-170" y="-76">
+			<label kind="exponentialrate" x="-180" y="-42">kLYdeg*LY</label>
+		</location>
+		<init ref="id48"/>
+		<transition>
+			<source ref="id48"/>
+			<target ref="id48"/>
+			<label kind="guard" x="-238" y="-187">LY&gt;0</label>
+			<label kind="assignment" x="-238" y="-170">LY--</label>
+			<nail x="-238" y="-144"/>
+			<nail x="-93" y="-144"/>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">PI3kactivation</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id49" x="-306" y="-153">
+			<label kind="exponentialrate" x="-316" y="-119">k2a*PI3K*IRS</label>
+		</location>
+		<init ref="id49"/>
+		<transition>
+			<source ref="id49"/>
+			<target ref="id49"/>
+			<label kind="guard" x="-339" y="-246">PI3K &gt; 0</label>
+			<label kind="assignment" x="-340" y="-229">PI3K--, aPI3K++</label>
+			<nail x="-357" y="-212"/>
+			<nail x="-246" y="-212"/>
+		</transition>
+	</template>
+	<template>
+		<name>PI3kdeactivation</name>
+		<location id="id50" x="-374" y="-204">
+			<label kind="exponentialrate" x="-408" y="-187">k2b*aPI3K</label>
+		</location>
+		<init ref="id50"/>
+		<transition>
+			<source ref="id50"/>
+			<target ref="id50"/>
+			<label kind="guard" x="-408" y="-314">aPI3K &gt; 0</label>
+			<label kind="assignment" x="-408" y="-297">aPI3K--, PI3K++</label>
+			<nail x="-425" y="-272"/>
+			<nail x="-306" y="-272"/>
+		</transition>
+	</template>
+	<template>
+		<name>AKTactivation</name>
+		<location id="id51" x="-552" y="-289">
+			<label kind="exponentialrate" x="-595" y="-272">k3a*aPI3K*AKT</label>
+		</location>
+		<init ref="id51"/>
+		<transition>
+			<source ref="id51"/>
+			<target ref="id51"/>
+			<label kind="guard" x="-595" y="-391">AKT &gt; 0 &amp;&amp; aPI3K &gt; 0</label>
+			<label kind="assignment" x="-595" y="-374">AKT--, aAKT++</label>
+			<nail x="-595" y="-348"/>
+			<nail x="-493" y="-348"/>
+		</transition>
+	</template>
+	<template>
+		<name>AKTdeactivation</name>
+		<location id="id52" x="-484" y="-212">
+			<label kind="exponentialrate" x="-501" y="-195">k3b*aAKT</label>
+		</location>
+		<init ref="id52"/>
+		<transition>
+			<source ref="id52"/>
+			<target ref="id52"/>
+			<label kind="guard" x="-518" y="-331">aAKT &gt; 0</label>
+			<label kind="assignment" x="-518" y="-314">aAKT--, AKT++</label>
+			<nail x="-535" y="-289"/>
+			<nail x="-391" y="-289"/>
+		</transition>
+	</template>
+	<template>
+		<name>mTORC1activation</name>
+		<declaration>    
+bool flagTORC1=false;
+
+
+void update()
+{
+
+    if( (amTORC1 &gt; mTORC1) &amp;&amp; !flagTORC1 ){
+        timeStartAmTORC1aboveMTORC1 = t;
+        flagTORC1 = true;
+    }
+
+
+}</declaration>
+		<location id="id53" x="-467" y="-229">
+			<label kind="exponentialrate" x="-493" y="-212">k4a*mTORC1*aAKT</label>
+		</location>
+		<init ref="id53"/>
+		<transition>
+			<source ref="id53"/>
+			<target ref="id53"/>
+			<label kind="guard" x="-510" y="-331">mTORC1 &gt; 0 &amp;&amp; aAKT &gt; 0</label>
+			<label kind="synchronisation" x="-510" y="-357">mTORactivated!</label>
+			<label kind="assignment" x="-510" y="-314">mTORC1--, amTORC1++, update()</label>
+			<nail x="-518" y="-297"/>
+			<nail x="-374" y="-297"/>
+		</transition>
+	</template>
+	<template>
+		<name>mTORC1deactivation</name>
+		<location id="id54" x="-544" y="-263">
+			<label kind="exponentialrate" x="-578" y="-246">k4b*amTORC1</label>
+		</location>
+		<init ref="id54"/>
+		<transition>
+			<source ref="id54"/>
+			<target ref="id54"/>
+			<label kind="guard" x="-595" y="-357">amTORC1 &gt; 0</label>
+			<label kind="assignment" x="-595" y="-340">amTORC1--, mTORC1++</label>
+			<nail x="-612" y="-323"/>
+			<nail x="-467" y="-323"/>
+		</transition>
+	</template>
+	<template>
+		<name>S6Kactivation</name>
+		<declaration>typedef int[-2147483648,2147483647] int32_t;
+
+int32_t maxAS6K = 0;
+int32_t minATAU = 200;
+
+
+
+void update()
+{
+
+    if( aS6K &gt; maxAS6K &amp;&amp; !drugAdded ){
+        maxAS6K = aS6K;
+
+
+    }
+
+}
+</declaration>
+		<location id="id55" x="-561" y="-272">
+			<label kind="exponentialrate" x="-612" y="-246">k5a*S6K*amTORC1</label>
+		</location>
+		<init ref="id55"/>
+		<transition>
+			<source ref="id55"/>
+			<target ref="id55"/>
+			<label kind="guard" x="-637" y="-374">S6K &gt; 0 &amp;&amp; amTORC1 &gt; 0</label>
+			<label kind="assignment" x="-637" y="-357">S6K--, aS6K++, update()</label>
+			<nail x="-637" y="-331"/>
+			<nail x="-501" y="-331"/>
+		</transition>
+	</template>
+	<template>
+		<name>S6Kdeactivation</name>
+		<location id="id56" x="-493" y="-255">
+			<label kind="exponentialrate" x="-503" y="-221">k5b*aS6K</label>
+		</location>
+		<init ref="id56"/>
+		<transition>
+			<source ref="id56"/>
+			<target ref="id56"/>
+			<label kind="guard" x="-552" y="-382">aS6K &gt; 0</label>
+			<label kind="assignment" x="-552" y="-365">aS6K--, S6K++</label>
+			<nail x="-569" y="-340"/>
+			<nail x="-408" y="-340"/>
+		</transition>
+	</template>
+	<template>
+		<name>PI3kdeactivationS6K</name>
+		<location id="id57" x="-790" y="-348">
+			<label kind="exponentialrate" x="-833" y="-323">k6f*aS6K*aPI3K</label>
+		</location>
+		<init ref="id57"/>
+		<transition>
+			<source ref="id57"/>
+			<target ref="id57"/>
+			<label kind="guard" x="-884" y="-484">aS6K &gt; 0 &amp;&amp; aPI3K &gt; 0</label>
+			<label kind="assignment" x="-884" y="-467">aPI3K--, PI3K++</label>
+			<nail x="-918" y="-442"/>
+			<nail x="-671" y="-442"/>
+		</transition>
+	</template>
+	<template>
+		<name>GSK3activation</name>
+		<location id="id58" x="-1377" y="-433">
+			<label kind="exponentialrate" x="-1402" y="-416">k7a*GSK3</label>
+		</location>
+		<init ref="id58"/>
+		<transition>
+			<source ref="id58"/>
+			<target ref="id58"/>
+			<label kind="guard" x="-1479" y="-569">GSK3 &gt; 0</label>
+			<label kind="assignment" x="-1479" y="-543">GSK3--, aGSK3++</label>
+			<nail x="-1487" y="-518"/>
+			<nail x="-1292" y="-518"/>
+		</transition>
+	</template>
+	<template>
+		<name>GSK3deactivation</name>
+		<location id="id59" x="-561" y="-212">
+			<label kind="exponentialrate" x="-603" y="-195">k7b*aGSK3*aAKT</label>
+		</location>
+		<init ref="id59"/>
+		<transition>
+			<source ref="id59"/>
+			<target ref="id59"/>
+			<label kind="guard" x="-629" y="-314">aGSK3 &gt; 0 &amp;&amp; aAKT &gt; 0</label>
+			<label kind="assignment" x="-612" y="-297">aGSK3--, GSK3++</label>
+			<nail x="-637" y="-272"/>
+			<nail x="-476" y="-272"/>
+		</transition>
+	</template>
+	<template>
+		<name>TAUactivation</name>
+		<declaration>typedef int[-2147483648,2147483647] int32_t;
+
+int32_t maxATAU = 0;
+int32_t minATAU = 200;
+
+clock aTauAboveMaxATau;
+double peakTime = 0.0;
+int count = 0;
+
+
+
+void update()
+{
+
+    if( aTAU &gt; maxATAU &amp;&amp; !drugAdded ){
+        maxATAU = aTAU;
+        //peakTime = t;
+//        minATAU = maxATAU;
+
+    }
+
+    if( aTAU &lt; minATAU &amp;&amp; drugAdded ){
+        minATAU = aTAU;
+
+    }
+
+    if( aTAU &gt; maxATAU &amp;&amp; drugAdded ){
+        aTauAboveMaxATau = t;
+        count = count + 1;
+
+    }
+
+
+
+}
+
+
+
+
+
+</declaration>
+		<location id="id60" x="-263" y="-110">
+			<label kind="exponentialrate" x="-323" y="-93">k9a*TAU*aGSK3</label>
+		</location>
+		<init ref="id60"/>
+		<transition>
+			<source ref="id60"/>
+			<target ref="id60"/>
+			<label kind="guard" x="-357" y="-238">TAU &gt; 0 &amp;&amp; aGSK3 &gt; 0</label>
+			<label kind="assignment" x="-357" y="-221">TAU--, aTAU++, update()</label>
+			<nail x="-357" y="-195"/>
+			<nail x="-170" y="-195"/>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">TauSynthesis</name>
+		<declaration>// Place local declarations here.
+                
+            </declaration>
+		<location id="id61" x="-807" y="-501">
+			<label kind="exponentialrate" x="-817" y="-467">ksynTau * SOURCE</label>
+		</location>
+		<init ref="id61"/>
+		<transition>
+			<source ref="id61"/>
+			<target ref="id61"/>
+			<label kind="guard" x="-823" y="-560">SOURCE &gt; 0</label>
+			<label kind="assignment" x="-824" y="-543">TAU = TAU + 1</label>
+			<nail x="-841" y="-526"/>
+			<nail x="-773" y="-526"/>
+		</transition>
+	</template>
+	<template>
+		<name>TAUdeactivation</name>
+		<location id="id62" x="-263" y="-102">
+			<label kind="exponentialrate" x="-297" y="-93">k9b*aTAU</label>
+		</location>
+		<init ref="id62"/>
+		<transition>
+			<source ref="id62"/>
+			<target ref="id62"/>
+			<label kind="guard" x="-365" y="-238">aTAU &gt; 0</label>
+			<label kind="assignment" x="-365" y="-212">aTAU--, TAU++</label>
+			<nail x="-374" y="-187"/>
+			<nail x="-144" y="-187"/>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">TauP1Aggregation1</name>
+		<declaration>// Place local declarations here.
+                
+            </declaration>
+		<location id="id63" x="-807" y="-501">
+			<label kind="exponentialrate" x="-817" y="-467">kaggTauP1 * aTAU * (aTAU) * 0.5</label>
+		</location>
+		<init ref="id63"/>
+		<transition>
+			<source ref="id63"/>
+			<target ref="id63"/>
+			<label kind="guard" x="-823" y="-560">aTAU &gt; 1</label>
+			<label kind="assignment" x="-824" y="-543">aTAU = aTAU - 2 , aggTAU = aggTAU + 2</label>
+			<nail x="-841" y="-526"/>
+			<nail x="-773" y="-526"/>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">TauP1Aggregation2</name>
+		<declaration>// Place local declarations here.
+                
+            </declaration>
+		<location id="id64" x="-807" y="-501">
+			<label kind="exponentialrate" x="-817" y="-467">kaggTauP1 * aTAU * aggTAU</label>
+		</location>
+		<init ref="id64"/>
+		<transition>
+			<source ref="id64"/>
+			<target ref="id64"/>
+			<label kind="guard" x="-823" y="-560">aTAU &gt; 0&amp;&amp; aggTAU &gt; 0</label>
+			<label kind="assignment" x="-824" y="-543">aTAU = aTAU - 1, aggTAU = aggTAU - 1 , aggTAU = aggTAU + 2</label>
+			<nail x="-841" y="-526"/>
+			<nail x="-773" y="-526"/>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">TangleFormation1</name>
+		<declaration>// Place local declarations here.
+                
+            </declaration>
+		<location id="id65" x="-1003" y="-540">
+			<label kind="exponentialrate" x="-1013" y="-506">ktangfor * aggTAU * (aggTAU ) * 0.5</label>
+		</location>
+		<init ref="id65"/>
+		<transition>
+			<source ref="id65"/>
+			<target ref="id65"/>
+			<label kind="guard" x="-1095" y="-632">aggTAU &gt; 1</label>
+			<label kind="assignment" x="-1095" y="-666">aggTAU = aggTAU - 2 , NFT = NFT + 2</label>
+			<nail x="-1113" y="-611"/>
+			<nail x="-943" y="-603"/>
+			<nail x="-935" y="-603"/>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">TangleFormation2</name>
+		<declaration>// Place local declarations here.
+                
+            </declaration>
+		<location id="id66" x="-807" y="-501">
+			<label kind="exponentialrate" x="-817" y="-467">ktangfor * aggTAU * NFT</label>
+		</location>
+		<init ref="id66"/>
+		<transition>
+			<source ref="id66"/>
+			<target ref="id66"/>
+			<label kind="guard" x="-824" y="-578">aggTAU &gt; 0&amp;&amp; NFT &gt; 0</label>
+			<label kind="assignment" x="-824" y="-561">aggTAU = aggTAU - 1, NFT = NFT + 1</label>
+			<nail x="-842" y="-527"/>
+			<nail x="-774" y="-527"/>
+		</transition>
+	</template>
+	<template>
+		<name>startmtor</name>
+		<location id="id67" x="-569" y="-178">
+		</location>
+		<location id="id68" x="-365" y="-178">
+			<name x="-391" y="-221">active</name>
+		</location>
+		<init ref="id67"/>
+		<transition>
+			<source ref="id67"/>
+			<target ref="id68"/>
+			<label kind="synchronisation" x="-543" y="-195">mTORactivated?</label>
+		</transition>
+	</template>
+	<template>
+		<name>ABETAprod2</name>
+		<location id="id69" x="0" y="0">
+			<label kind="exponentialrate" x="-10" y="34">kprodAbeta*aGSK3</label>
+		</location>
+		<init ref="id69"/>
+		<transition>
+			<source ref="id69"/>
+			<target ref="id69"/>
+			<label kind="guard" x="-102" y="-127">aGSK3 &gt; 0</label>
+			<label kind="assignment" x="-102" y="-110">ABETA=ABETA+1</label>
+			<nail x="-110" y="-85"/>
+			<nail x="110" y="-85"/>
+		</transition>
+	</template>
+	<template>
+		<name>AbetaDimer</name>
+		<location id="id70" x="-680" y="-510">
+			<label kind="exponentialrate" x="-690" y="-476">kprodAbetaDimer*ABETA*ABETA</label>
+		</location>
+		<init ref="id70"/>
+		<transition>
+			<source ref="id70"/>
+			<target ref="id70"/>
+			<label kind="guard" x="-773" y="-612">ABETA &gt; 1</label>
+			<label kind="assignment" x="-782" y="-595">ABETA = ABETA - 2, ABETADIMER=ABETADIMER+1</label>
+			<nail x="-757" y="-569"/>
+			<nail x="-595" y="-569"/>
+		</transition>
+	</template>
+	<template>
+		<name>AbetaDimerRel</name>
+		<location id="id71" x="0" y="0">
+			<label kind="exponentialrate" x="-10" y="34">krelAbetaDimer*ABETADIMER</label>
+		</location>
+		<init ref="id71"/>
+		<transition>
+			<source ref="id71"/>
+			<target ref="id71"/>
+			<label kind="guard" x="-119" y="-102">ABETADIMER &gt; 1</label>
+			<label kind="assignment" x="-119" y="-127">ABETADIMER=ABETADIMER-1, ABETA=ABETA+2</label>
+			<nail x="-93" y="-85"/>
+			<nail x="110" y="-85"/>
+		</transition>
+	</template>
+	<template>
+		<name>AbetaPlaque</name>
+		<location id="id72" x="0" y="0">
+			<label kind="exponentialrate" x="-10" y="34">kprodAbetaPlaque*ABETADIMER*ABETADIMER</label>
+		</location>
+		<init ref="id72"/>
+		<transition>
+			<source ref="id72"/>
+			<target ref="id72"/>
+			<label kind="guard" x="-93" y="-119">ABETADIMER &gt; 1</label>
+			<label kind="assignment" x="-85" y="-93">ABETAPLAQUE=ABETAPLAQUE+1, ABETADIMER=ABETADIMER-2</label>
+			<nail x="-76" y="-68"/>
+			<nail x="93" y="-68"/>
+		</transition>
+	</template>
+	<template>
+		<name>AbetaRelPlaque</name>
+		<location id="id73" x="-238" y="-34">
+			<label kind="exponentialrate" x="-248" y="0">krelAbetaPlaque*ABETAPLAQUE</label>
+		</location>
+		<init ref="id73"/>
+		<transition>
+			<source ref="id73"/>
+			<target ref="id73"/>
+			<label kind="guard" x="-314" y="-161">ABETAPLAQUE &gt; 0</label>
+			<label kind="assignment" x="-314" y="-144">ABETAPLAQUE=ABETAPLAQUE-1, ABETADIMER=ABETADIMER+2</label>
+			<nail x="-314" y="-119"/>
+			<nail x="-119" y="-119"/>
+		</transition>
+	</template>
+	<template>
+		<name>ABETAdeg</name>
+		<location id="id74" x="-731" y="-493">
+			<label kind="exponentialrate" x="-790" y="-476">kabetadeg*ABETA</label>
+		</location>
+		<init ref="id74"/>
+		<transition>
+			<source ref="id74"/>
+			<target ref="id74"/>
+			<label kind="guard" x="-816" y="-646">ABETA &gt; 0</label>
+			<label kind="assignment" x="-824" y="-620">ABETA--</label>
+			<nail x="-841" y="-595"/>
+			<nail x="-620" y="-595"/>
+		</transition>
+	</template>
+	<system>
+system PI3kactivation, PI3kdeactivation,
+AKTactivation, AKTdeactivation, 
+mTORC1activation, mTORC1deactivation,
+S6Kactivation, S6Kdeactivation, PI3kdeactivationS6K,
+GSK3activation, GSK3deactivation,
+TAUactivation, TAUdeactivation, //TauSynthesis, TauP1Aggregation1, TauP1Aggregation2, TangleFormation1, TangleFormation2,
+ABETAprod2, ABETAdeg, //AbetaDimer, AbetaDimerRel, AbetaPlaque, AbetaRelPlaque,
+
+startmtor,
+
+
+/*FOR LY294002 SINGLE DOSE UNCOMMENT */
+/*ON Declaration tab define the dose in variable DOSE_LY 
+be sure the variable DOSE=0*/
+/* 
+DrugAdmLY,
+PI3KbinLY, PI3KrelLY,
+aPI3KbinLY, aPI3KrelLY,
+LYDeg; 
+*/
+
+/*FOR LY294002 DAILY UNCOMMENT */
+/*ON Declaration tab define the dose in variable DOSE_LY 
+be sure the variable DOSE=0*/
+/* 
+DrugAdmLY2,
+PI3KbinLY, PI3KrelLY,
+aPI3KbinLY, aPI3KrelLY,
+LYDeg; 
+*/
+
+/*FOR LY294002 + RAP UNCOMMENT */
+/*ON Declaration tab define the dose in variable DOSE_LY 
+be sure the variable DOSE has the dose of rapamycin*/
+/* 
+DrugAdmRap,
+PI3KbinLY, PI3KrelLY,
+aPI3KbinLY, aPI3KrelLY,
+LYDeg; 
+*/
+
+
+/* FOR RAP SINGLE DOSE UNCOMMENT */
+/*ON Declaration tab define the dose in variable DOSE 
+be sure the variable DOSE_LY=0*/
+/*
+DrugAdmRap, 
+mTORC1binRAP, mTORC1relRAP,
+amTORC1binRAP, amTORC1relRAP,
+RAPDeg;
+*/
+
+/* FOR RAP DAILY DOSE UNCOMMENT */
+/*ON Declaration tab define the dose in variable DOSE 
+be sure the variable DOSE_LY=0*/
+/*
+DrugAdmRap2, 
+mTORC1binRAP, mTORC1relRAP,
+amTORC1binRAP, amTORC1relRAP,
+RAPDeg;
+*/
+
+/* FOR BEZ SINGLE DOSE UNCOMMENT */
+/*ON Declaration tab define the dose in variable DOSE */
+/*DrugAdmBez2, 
+mTORC1binBEZ, mTORC1relBEZ,
+amTORC1binBEZ, amTORC1relBEZ,
+PI3KbinBEZ, PI3KrelBEZ,
+aPI3KbinBEZ, aPI3KrelBEZ,
+BEZDeg;
+*/
+
+/* FOR BEZ DAILY  UNCOMMENT */
+/*ON Declaration tab define the dose in variable DOSE */
+
+DrugAdmBez, 
+mTORC1binBEZ, mTORC1relBEZ,
+amTORC1binBEZ, amTORC1relBEZ,
+PI3KbinBEZ, PI3KrelBEZ,
+aPI3KbinBEZ, aPI3KrelBEZ,
+BEZDeg;
+
+
+/*FOR CONTROL SCENARIO DEFINE DOSE=0 AND DOSE_LY=0 AND UNCOMMENT ONE OF THE SCENARIOS LISTED ABOVE*/
+
+
+
+   </system>
+	<queries>
+		<query>
+			<formula>Pr [&lt;=300] (&lt;&gt; (drugAdded) &amp;&amp; (aS6K &gt; S6Kactivation.maxAS6K))</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>Pr [&lt;=300] (&lt;&gt; (drugAdded) &amp;&amp; (aTAU &gt; TAUactivation.maxATAU))</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>Pr [&lt;=300] (&lt;&gt; (drugAdded) &amp;&amp; (ABETA &lt; 113*0.95))</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E[&lt;=300;200] (max: ABETA )</formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>

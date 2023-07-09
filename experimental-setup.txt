@@ -1,0 +1,107 @@
+In order to run the experiments it is necessary a prior knowledge in UPPAAL tool. Please, following the links with tutorials and documentation.
+
+https://uppaal.org/documentation/#tutorials
+
+https://docs.uppaal.org/
+
+************* HOW TO SETUP THE SCENARIOS? **************
+
+This file explain how to set up the PTAs to verify the properties for each scenario.
+
+
+/**************  FOR RAP DAILY DOSE ************** /
+1 - TAB Declaration
+	Variables 
+		DOSE=50;
+		DOSE_LY=0
+2 - TAB System Declaration
+	Uncomment the templates:
+		DrugAdmRap2, 
+		mTORC1binRAP, mTORC1relRAP,
+		amTORC1binRAP, amTORC1relRAP,
+		RAPDeg;
+
+/**************  FOR RAP SINGLE DOSE ************** /
+1 - TAB Declaration
+	Variables 
+		DOSE=50; or DOSE=500
+		DOSE_LY=0
+2 - TAB System Declaration
+	Uncomment the templates:
+		DrugAdmRap2, 
+		mTORC1binRAP, mTORC1relRAP,
+		amTORC1binRAP, amTORC1relRAP,
+		RAPDeg;
+
+/**************  FOR LY DAILY DOSE ************** /
+1 - TAB Declaration
+	Variables 
+		DOSE=0;
+		DOSE_LY=50
+2 - TAB System Declaration
+	Uncomment the templates:
+		DrugAdmLY2,
+		PI3KbinLY, PI3KrelLY,
+		aPI3KbinLY, aPI3KrelLY,
+		LYDeg; 
+
+/**************  FOR LY SINGLE DOSE ************** /
+1 - TAB Declaration
+	Variables 
+		DOSE=0; 
+		DOSE_LY=50; or DOSE_LY =500
+2 - TAB System Declaration
+	Uncomment the templates:
+		DrugAdmLY,
+		PI3KbinLY, PI3KrelLY,
+		aPI3KbinLY, aPI3KrelLY,
+		LYDeg; 
+
+/**************  FOR LY + RAP DOSE ************* */
+1 - TAB Declaration
+	Variables 
+		DOSE=50; 
+		DOSE_LY=50; 
+2 - TAB System Declaration
+	Uncomment the templates:
+		DrugAdmRap,
+		PI3KbinLY, PI3KrelLY,
+		aPI3KbinLY, aPI3KrelLY,
+		LYDeg;
+
+
+/**************  FOR BEZ DAILY  ************** /
+1 - TAB Declaration
+	Variables 
+		DOSE=50;
+		DOSE_LY=0
+2 - TAB System Declaration
+	Uncomment the templates:
+		DrugAdmBez, 
+		mTORC1binBEZ, mTORC1relBEZ,
+		amTORC1binBEZ, amTORC1relBEZ,
+		PI3KbinBEZ, PI3KrelBEZ,
+		aPI3KbinBEZ, aPI3KrelBEZ,
+		BEZDeg;
+
+/* FOR BEZ SINGLE DOSE */
+1 - TAB Declaration
+	Variables 
+		DOSE=50; or DOSE=500
+		DOSE_LY=0
+2 - TAB System Declaration
+	Uncomment the templates:
+		DrugAdmBez2, 
+		mTORC1binBEZ, mTORC1relBEZ,
+		amTORC1binBEZ, amTORC1relBEZ,
+		PI3KbinBEZ, PI3KrelBEZ,
+		aPI3KbinBEZ, aPI3KrelBEZ,
+		BEZDeg;
+
+
+
+
+/************** 
+FOR CONTROL SCENARIO DEFINE DOSE=0 AND DOSE_LY=0 AND UNCOMMENT ONE OF THE SCENARIOS LISTED ABOVE
+************* */
+
